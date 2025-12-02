@@ -1,0 +1,6 @@
+_target_: engine.visualizer.DetectionVisualizer
+
+threshold: 0.5
+freq: 1000
+downscale_ratio: 0.5
+

@@ -1,0 +1,12 @@
+defaults:
+  - _self_
+  - detector: p2pnet
+
+video_dir: "/groups/gaa50073/nakayama-haruto/hanabi_videos/202408_Yokohama_WorldPorters"
+output_dir: "outputs_1113/202408_Yokohama_WorldPorters"
+video_extension: "MOV"
+
+
+task_index: None
+task_stepsize: None
+

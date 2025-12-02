@@ -1,0 +1,3 @@
+pixi add pydantic
+
+pixi run pip install --extra-index-url https://pypi.nvidia.com --upgrade nvidia-dali-cuda120

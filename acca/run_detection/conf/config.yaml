@@ -1,0 +1,15 @@
+defaults:
+  - _self_
+  - io_setting: io_setting
+  - detector: p2pnet
+
+
+input_video_path_dir: "video_inputs/demo_videos"
+output_dir: "demo_outputs"
+gpu_id: 0
+
+hydra_log_dir: "demo_outputs/demo_videos/detection_hydra_log"
+
+hydra:
+  run:
+    dir: "${hydra_log_dir}"

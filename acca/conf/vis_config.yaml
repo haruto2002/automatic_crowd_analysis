@@ -1,0 +1,14 @@
+defaults:
+  - _self_
+  - detection_visualizer: display_detection
+  - tracking_visualizer: display_trajectory
+  
+
+video_dir: "/groups/gaa50073/nakayama-haruto/hanabi_videos/202408_Yokohama_WorldPorters"
+output_dir: "outputs_aiccel/202408_Yokohama_WorldPorters"
+video_extension: "MOV"
+
+
+task_index: 1
+task_stepsize: 1
+

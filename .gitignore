@@ -1,0 +1,15 @@
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+
+3rd
+.gitattributes
+
+__pycache__
+acca/demo_videos
+acca/results
+acca/output*
+acca/tmp*
+
+acca/p2pnet/network/*.pth
+*.pth

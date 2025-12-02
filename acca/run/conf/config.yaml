@@ -1,0 +1,14 @@
+defaults:
+  - _self_
+  - detector: p2pnet
+  - tracker: bytetrack
+  - detection_visualizer: display_detection
+  - tracking_visualizer: display_trajectory
+
+video_path: "demo_videos/demo_1s_1.mov"
+output_dir: "demo_outputs_1113/demo_1s_1"
+hydra_log_dir: "demo_outputs_1113/demo_1s_1/hydra_log"
+
+hydra:
+  run:
+    dir: "${hydra_log_dir}"

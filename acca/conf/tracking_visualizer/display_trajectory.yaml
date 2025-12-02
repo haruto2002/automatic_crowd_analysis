@@ -1,0 +1,9 @@
+_target_: engine.visualizer.TrackingVisualizer
+
+freq: 5
+vis_length: 30
+start_frame: 1000
+end_frame: 1300
+downscale_ratio: 0.5
+
+

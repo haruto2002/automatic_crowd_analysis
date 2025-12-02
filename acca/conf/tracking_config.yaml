@@ -1,0 +1,9 @@
+defaults:
+  - _self_
+  - tracker: bytetrack
+
+results_root_dir: "outputs_aiccel/202408_Yokohama_WorldPorters"
+
+task_index: None
+task_stepsize: None
+

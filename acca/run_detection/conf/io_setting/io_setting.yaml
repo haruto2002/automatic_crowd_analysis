@@ -1,0 +1,6 @@
+_target_: run_detection.io_setting.IOSetting
+
+input_video_path_dir: ${input_video_path_dir}
+gpu_id: ${gpu_id}
+save_root_dir: ${output_dir}
+
