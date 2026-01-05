@@ -1,0 +1,7 @@
+_target_: engine.visualizer.graph_movie_creator.GraphMovieCreator
+threshold: 0.5
+downscale_ratio: 0.5
+fps: 10
+bar: True
+
+

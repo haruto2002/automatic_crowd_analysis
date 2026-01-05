@@ -1,0 +1,10 @@
+_target_: engine.image_visualizer.DetectionVisualizerForImage
+threshold: 0.5
+freq: 1
+downscale_ratio: 0.5
+img_extension: "jpg"
+with_movie: True
+fps: 10
+
+
+

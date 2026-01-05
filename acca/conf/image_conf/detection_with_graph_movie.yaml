@@ -1,0 +1,17 @@
+defaults:
+  - _self_
+  - detector: p2pnet
+  - graph_movie_creator: graph_movie_creator
+
+
+pipeline:
+  - detector
+  - graph_movie_creator
+
+image_dir: "/home/aag16599bn/research/hanabi_videos/hanabi_all/MOJI_2024"
+output_dir: "demo"
+image_extension: "jpg"
+resume: False
+
+task_index: None
+task_stepsize: None

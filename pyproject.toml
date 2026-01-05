@@ -189,6 +189,7 @@ sympy = "==1.12.1"
 lap = "*"
 opencv-python = "*"
 pydantic = "*"
+albumentations = "*"
 
 
 [tool.pixi.pypi-options]

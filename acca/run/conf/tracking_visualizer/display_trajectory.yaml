@@ -1,8 +1,0 @@
-_target_: run.visualizer.TrackingVisualizer
-
-freq: 5
-start_frame: None
-end_frame: None
-downscale_ratio: 0.5
-
-

@@ -1,6 +1,0 @@
-_target_: run.visualizer.DetectionVisualizer
-
-threshold: 0.5
-freq: 10
-downscale_ratio: 0.5
-
