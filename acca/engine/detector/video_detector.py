@@ -23,6 +23,8 @@ class VideoDetector:
         dtype,
         bar=True,
     ):
+        assert Path(cfg_path).exists(), f"Config file does not exist: {cfg_path} Current working directory: {Path.cwd()}"
+        assert Path(weight_path).exists(), f"Weight file does not exist: {weight_path} Current working directory: {Path.cwd()}"
         self.cfg_path = cfg_path
         self.weight_path = weight_path
         self.gpu_id = gpu_id
@@ -120,7 +122,7 @@ class VideoDetector:
             )
             pipeline.build()
             n_samples = pipeline.epoch_size()["__Video_0"]
-            with torch.inference_mode(), torch.autocast("cuda", dtype=dtype):
+            with torch.no_grad(), torch.autocast("cuda", dtype=dtype):
                 for i in tqdm(
                     range(n_samples),
                     desc="Processing frames",

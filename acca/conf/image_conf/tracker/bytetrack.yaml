@@ -1,0 +1,10 @@
+_target_: engine.tracker.tracker.Tracker
+
+img_h_size: 4320
+img_w_size: 7680
+track_thresh: 0.6
+track_buffer: 30
+match_thresh: 10.0
+distance_metric: euclidean
+
+bar: true

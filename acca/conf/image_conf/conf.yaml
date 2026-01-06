@@ -1,0 +1,14 @@
+defaults:
+  - _self_
+  - detector: p2pnet
+  - tracker: bytetrack
+
+
+pipeline:
+  - detector
+  - tracker
+
+image_dir: "images/DSC_6628"
+output_dir: "results"
+image_extension: "jpg"
+resume: False

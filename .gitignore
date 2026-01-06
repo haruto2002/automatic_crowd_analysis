@@ -15,3 +15,7 @@ acca/5min_freq_images
 
 acca/p2pnet/network/*.pth
 *.pth
+
+videos
+images
+outputs*

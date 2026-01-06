@@ -1,4 +1,4 @@
-_target_: engine.visualizer.DetectionVisualizer
+_target_: engine.visualizer.video_visualizer.DetectionVisualizer
 
 threshold: 0.5
 freq: 1000

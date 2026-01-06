@@ -12,8 +12,8 @@ pixi run python -m run_detection.py で実行
 
 @hydra.main(config_path="conf", config_name="tracking_config", version_base=None)
 def main(cfg: DictConfig) -> None:
-    os.environ["OMP_NUM_THREADS"] = "12"
-    os.environ["MKL_NUM_THREADS"] = "12"
+    # os.environ["OMP_NUM_THREADS"] = "12"
+    # os.environ["MKL_NUM_THREADS"] = "12"
 
     print("Config:\n" + OmegaConf.to_yaml(cfg))
 
@@ -27,7 +27,9 @@ def main(cfg: DictConfig) -> None:
         end = start + int(os.environ["TASK_STEPSIZE"])
 
     else:
-        assert cfg.task_index is not None and cfg.task_stepsize is not None, "task_index and task_stepsize must be set"
+        assert cfg.task_index is not None and cfg.task_stepsize is not None, (
+            "task_index and task_stepsize must be set"
+        )
         start = int(cfg.task_index) - 1
         end = start + int(cfg.task_stepsize)
 

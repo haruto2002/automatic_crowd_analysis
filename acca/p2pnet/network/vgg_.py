@@ -9,8 +9,8 @@ import torch
 import torch.nn as nn
 
 model_paths = {
-    "vgg16": "./p2pnet/network/vgg16_features-amdegroot-88682ab5.pth",
-    "vgg16_bn": "./p2pnet/network/vgg16_bn-6c64b313.pth",
+    "vgg16": "./acca/p2pnet/network/vgg16_features-amdegroot-88682ab5.pth",
+    "vgg16_bn": "./acca/p2pnet/network/vgg16_bn-6c64b313.pth",
 }
 
 
@@ -21,12 +21,12 @@ def get_pretrained_weight():
                 "wget",
                 "https://download.pytorch.org/models/vgg16_features-amdegroot-88682ab5.pth",
             ],
-            cwd="./p2pnet/network/",
+            cwd="./acca/p2pnet/network/",
         )
     if not os.path.exists(model_paths["vgg16_bn"]):
         subprocess.run(
             ["wget", "https://download.pytorch.org/models/vgg16_bn-6c64b313.pth"],
-            cwd="./p2pnet/network/",
+            cwd="./acca/p2pnet/network/",
         )
 
 

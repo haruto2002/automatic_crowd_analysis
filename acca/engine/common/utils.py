@@ -25,7 +25,9 @@ class RiskEstimationVisOutputDir(BaseModel):
 class VisOutputDir(BaseModel):
     detection: DetectionVisOutputDir = Field(default_factory=DetectionVisOutputDir)
     tracking: TrackingVisOutputDir = Field(default_factory=TrackingVisOutputDir)
-    risk_estimation: RiskEstimationVisOutputDir = Field(default_factory=RiskEstimationVisOutputDir)
+    risk_estimation: RiskEstimationVisOutputDir = Field(
+        default_factory=RiskEstimationVisOutputDir
+    )
 
 
 class PhaseOutputDir(BaseModel):
@@ -81,7 +83,9 @@ class HanabiImageData(BaseModel):
         if isinstance(phase, str):
             phase = [phase]
 
-        assert phase[0] in PhaseOutputDir.model_fields, "phase must be in PhaseOutputDir"
+        assert phase[0] in PhaseOutputDir.model_fields, (
+            "phase must be in PhaseOutputDir"
+        )
 
         # 1. detection / tracking / risk_estimation
         if len(phase) == 1:
@@ -97,13 +101,21 @@ class HanabiImageData(BaseModel):
             assert phase[0] == "vis", "phase must start with vis"
             assert len(phase) >= 3, "vis phase must be ['vis', mode, kind]"
 
-            vis_mode = phase[1]  # VisOutputDirの属性名: "detection", "tracking", "risk_estimation"
-            vis_kind = phase[2]  # DetectionVisOutputDirの属性名: "graph", "all_vis", "graph_movie" など
+            vis_mode = phase[
+                1
+            ]  # VisOutputDirの属性名: "detection", "tracking", "risk_estimation"
+            vis_kind = phase[
+                2
+            ]  # DetectionVisOutputDirの属性名: "graph", "all_vis", "graph_movie" など
 
-            assert vis_mode in VisOutputDir.model_fields, "vis_mode must be in VisOutputDir"
+            assert vis_mode in VisOutputDir.model_fields, (
+                "vis_mode must be in VisOutputDir"
+            )
 
             vis_group = getattr(self.phase_outputdir.vis, vis_mode)
-            assert vis_kind in vis_group.model_fields, "vis_kind must be in vis_mode model_fields"
+            assert vis_kind in vis_group.model_fields, (
+                "vis_kind must be in vis_mode model_fields"
+            )
 
             output_dir = self.output_dir.joinpath(*phase)
             output_dir.mkdir(parents=True, exist_ok=True)
@@ -116,6 +128,8 @@ class HanabiImageData(BaseModel):
 
 
 def load_previous_state_file(previous_state_file: Path):
-    hanabi_image_data = HanabiImageData.model_validate_json(previous_state_file.read_text())
+    hanabi_image_data = HanabiImageData.model_validate_json(
+        previous_state_file.read_text()
+    )
     hanabi_image_data.set_state_file()
     return hanabi_image_data

@@ -1,7 +1,6 @@
 from pathlib import Path
 
 from bytetrack.run_point_tracking import tracking
-from engine.common.utils import HanabiImageData
 from pydantic import BaseModel
 
 
@@ -36,19 +35,11 @@ class Tracker:
         )
         self.disable_tqdm = not bar
 
-    def __call__(self, hanabi_image_data: HanabiImageData):
-        assert hanabi_image_data.phase_outputdir.detection is not None, (
-            "detection data directory is not set"
-        )
-        detection_data_dir = hanabi_image_data.phase_outputdir.detection
-        self.run(
-            detection_data_dir, hanabi_image_data.get_output_dir_for_phase("tracking")
-        )
-
-    def run(self, detection_data_dir: Path, track_save_dir: Path):
-        tracking(
-            self.args,
-            detection_data_dir.as_posix(),
-            track_save_dir.as_posix(),
-            disable_tqdm=self.disable_tqdm,
-        )
+    def run(self, results_dirs: list[Path]):
+        for result_dir in results_dirs:
+            detection_data_dir = result_dir.joinpath("detection")
+            track_save_dir = result_dir.joinpath("track")
+            track_save_dir.mkdir(parents=True, exist_ok=True)
+            tracking(
+                self.args, detection_data_dir.as_posix(), track_save_dir.as_posix(), disable_tqdm=self.disable_tqdm
+            )

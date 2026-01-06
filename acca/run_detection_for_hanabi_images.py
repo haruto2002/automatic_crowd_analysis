@@ -2,13 +2,16 @@ import os
 from pathlib import Path
 
 import hydra
+from engine.common.utils import HanabiImageData, load_previous_state_file
 from hydra.utils import instantiate
 from omegaconf import DictConfig, OmegaConf
 
-from engine.common.utils import HanabiImageData, load_previous_state_file
 
-
-@hydra.main(config_path="conf/image_conf", config_name="detection_with_graph_movie", version_base=None)
+@hydra.main(
+    config_path="conf/hanabi_images_conf",
+    config_name="detection_with_graph_movie",
+    version_base=None,
+)
 def main(cfg: DictConfig) -> None:
     os.environ["OMP_NUM_THREADS"] = "12"
     os.environ["MKL_NUM_THREADS"] = "12"
@@ -24,7 +27,9 @@ def main(cfg: DictConfig) -> None:
         end = start + int(os.environ["TASK_STEPSIZE"])
 
     else:
-        assert cfg.task_index is not None and cfg.task_stepsize is not None, "task_index and task_stepsize must be set"
+        assert cfg.task_index is not None and cfg.task_stepsize is not None, (
+            "task_index and task_stepsize must be set"
+        )
         start = int(cfg.task_index) - 1
         end = start + int(cfg.task_stepsize)
 
@@ -36,7 +41,9 @@ def main(cfg: DictConfig) -> None:
     for i, image_dir in enumerate(image_dirs):
         print(f"Processing {image_dir} ({i + 1} of {len(image_dirs)})")
         hanabi_image_data = HanabiImageData(
-            img_dir=Path(image_dir), root_output_dir=Path(root_save_dir), img_extension=cfg.image_extension
+            img_dir=Path(image_dir),
+            root_output_dir=Path(root_save_dir),
+            img_extension=cfg.image_extension,
         )
         existing_state_file = hanabi_image_data.set_data()
         print(hanabi_image_data.state_file)

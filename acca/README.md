@@ -1,13 +1,3 @@
-# Automatic Crowd Congestion Analysis System 
-![overview](figs/overview.gif)
-
-# Overall Pipeline
-<img src="figs/pipeline.png" alt="Pipeline" style="display:block; margin-bottom:30px;" />
-
-# Crowd Risk Analysis
-![demo](figs/graph.gif)
-<img src="figs/heatmap.png" alt="Heatmap" />
-
 # Setup environment
 
 We utilize Miniconda to create the virtual environment and Python=3.10.  

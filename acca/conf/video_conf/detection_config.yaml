@@ -1,12 +1,19 @@
 defaults:
   - _self_
   - detector: p2pnet
+  - detection_visualizer: display_detection
+  - tracker: bytetrack
+  - tracking_visualizer: display_trajectory
 
-video_dir: "/groups/gaa50073/nakayama-haruto/hanabi_videos/202408_Yokohama_WorldPorters"
-output_dir: "outputs_1113/202408_Yokohama_WorldPorters"
+pipeline:
+  - detector
+  # - detection_visualizer
+  - tracker
+  # - tracking_visualizer
+
+video_dir: "/homes/hnakayama/automatic_crowd_analysis/videos"
+output_dir: "outputs"
 video_extension: "MOV"
 
-
-task_index: None
-task_stepsize: None
-
+task_index: 1
+task_stepsize: 1

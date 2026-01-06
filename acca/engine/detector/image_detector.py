@@ -1,14 +1,11 @@
 from pathlib import Path
 
-from omegaconf import OmegaConf
-
-import numpy as np
-
-import torch
-
 import albumentations as A
 import cv2
+import numpy as np
+import torch
 from engine.common.utils import HanabiImageData
+from omegaconf import OmegaConf
 from p2pnet.utils.util_dnn import suggest_network
 from tqdm import tqdm
 
@@ -25,6 +22,12 @@ class ImageDetector:
         img_extension,
         bar=True,
     ):
+        assert Path(cfg_path).exists(), (
+            f"Config file does not exist: {cfg_path} Current working directory: {Path.cwd()}"
+        )
+        assert Path(weight_path).exists(), (
+            f"Weight file does not exist: {weight_path} Current working directory: {Path.cwd()}"
+        )
         self.cfg_path = cfg_path
         self.weight_path = weight_path
         self.device = f"cuda:{gpu_id}"
@@ -90,15 +93,25 @@ class ImageDetector:
         resize_size: tuple[int, int],
     ):
         batch_num = (len(image_paths) + self.batch_size - 1) // self.batch_size
-        for i in tqdm(range(batch_num), desc="Processing batches", disable=self.disable_tqdm):
-            batch_image_paths = image_paths[i * self.batch_size : (i + 1) * self.batch_size]
+        for i in tqdm(
+            range(batch_num), desc="Processing batches", disable=self.disable_tqdm
+        ):
+            batch_image_paths = image_paths[
+                i * self.batch_size : (i + 1) * self.batch_size
+            ]
             image_names = [image_path.stem for image_path in batch_image_paths]
             batch = self.set_image_batch(batch_image_paths, resize_size)
-            with torch.inference_mode(), torch.autocast("cuda", dtype=self.dtype):
+            with torch.no_grad(), torch.autocast("cuda", dtype=self.dtype):
                 outputs = detector(batch)
-                outputs_scores = torch.nn.functional.softmax(outputs["pred_logits"], -1)[:, :, 1].detach().cpu()
+                outputs_scores = (
+                    torch.nn.functional.softmax(outputs["pred_logits"], -1)[:, :, 1]
+                    .detach()
+                    .cpu()
+                )
                 outputs_points = outputs["pred_points"].detach().cpu().numpy()
-                for img_name, scores, points in zip(image_names, outputs_scores, outputs_points, strict=True):
+                for img_name, scores, points in zip(
+                    image_names, outputs_scores, outputs_points, strict=True
+                ):
                     save_path = save_dir.joinpath(f"{img_name}.txt")
                     self.post_process(
                         scores,
@@ -119,7 +132,9 @@ class ImageDetector:
         threshold = 0.1
         points = points[scores > threshold]
         scores = scores[scores > threshold]
-        inverted_detect_points = self.invert_transform_points(image_size, resize_size, points)
+        inverted_detect_points = self.invert_transform_points(
+            image_size, resize_size, points
+        )
         self.save_detection_data(save_path, inverted_detect_points, scores)
 
     def invert_transform_points(self, raw_size, resize_size, points):

@@ -1,4 +1,4 @@
-_target_: engine.visualizer.TrackingVisualizer
+_target_: engine.visualizer.video_visualizer.TrackingVisualizer
 
 freq: 5
 vis_length: 30
