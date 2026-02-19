@@ -1,5 +1,0 @@
-# めも
-
-危険度のヒートマップ可視化関連は
-https://github.com/haruto2002/P2PNet/tree/danger/BMVC
-にコードがある。
