@@ -1,0 +1,9 @@
+path2homography_matrix: bcm/venue_data/202508_yokohama/worldporters/homography.txt
+points_dir: Yokohama_202508/WorldPorters/detection
+original_area_size: 
+  - 1600
+  - 1600
+all_map_left_top_coor:
+  - 345
+  - 450
+scale: 0.175

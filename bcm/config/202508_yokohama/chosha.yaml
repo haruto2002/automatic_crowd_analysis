@@ -1,0 +1,9 @@
+path2homography_matrix: bcm/venue_data/202508_yokohama/chosha/homography.txt
+points_dir: Yokohama_202508/Chosha/detection
+original_area_size: 
+  - 1100
+  - 1100
+all_map_left_top_coor:
+  - 795
+  - 1085
+scale: 0.235

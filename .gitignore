@@ -1,21 +1,15 @@
-# pixi environments
-.pixi/*
-!.pixi/config.toml
+**__pycache__**
+**demo**
+**results**
+**output**
+**tmp**
+**logs**
+**videos**
+**images**
+**outputs**
 
-3rd
-.gitattributes
+**.pth
+**.tar.gz
 
-__pycache__
-acca/demo*
-acca/results
-acca/output*
-acca/tmp*
-acca/logs
-acca/5min_freq_images
-
-acca/p2pnet/network/*.pth
-*.pth
-
-videos
-images
-outputs*
+**cfa/202408_Yokohama_WorldPorters**
+**Yokohama_202508**

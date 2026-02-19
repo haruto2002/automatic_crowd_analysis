@@ -23,12 +23,11 @@ dependencies = [
   "pydantic",
   "timm",
   "pandas",
+  "websockets",
+  "asyncio",
+  "onvif-zeep",
 ]
 
-[project.optional-dependencies]
-dev = [
-  "ruff",
-]
 
 # -------------------------
 # pixi: conda 側（OS/ネイティブ/ツール）

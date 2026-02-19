@@ -1,0 +1,9 @@
+path2homography_matrix: bcm/venue_data/202508_yokohama/kokusaibashi/homography.txt
+points_dir: Yokohama_202508/Kokusaibashi/detection
+original_area_size: 
+  - 1000
+  - 1000
+all_map_left_top_coor:
+  - 35
+  - 85
+scale: 0.125

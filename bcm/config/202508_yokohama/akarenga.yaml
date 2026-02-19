@@ -1,0 +1,9 @@
+path2homography_matrix: bcm/venue_data/202508_yokohama/akarenga/homography.txt
+points_dir: Yokohama_202508/Akarenga/detection
+original_area_size: 
+  - 1500
+  - 1500
+all_map_left_top_coor:
+  - 1250
+  - 800
+scale: 0.52
