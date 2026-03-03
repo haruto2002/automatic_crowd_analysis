@@ -56,7 +56,8 @@ class ReaderStats:
     det_time: float = 0.0
 
     skipped_frames: int = 0
-    total_time: float = 0.0
+    process_time: float = 0.0
+    display_time: float = 0.0
 
 
 class FFmpegRTSPReader:
@@ -92,6 +93,7 @@ class FFmpegRTSPReader:
         # detection（最新結果1つ）
         self._det_lock = threading.Lock()
         self._input_frame: np.ndarray = np.zeros((self.w, self.h, 3), np.uint8)
+        self._input_frame_read_ts: float = 0.0
         self._det_result: Optional[np.ndarray] = None
         self._det_seq: int = 0
         self._det_time: float = 0.0
@@ -149,6 +151,7 @@ class FFmpegRTSPReader:
 
                 with self._det_lock:
                     self._input_frame = frame
+                    self._input_frame_read_ts=frame_read_ts
                     self._det_result = res
                     self._det_seq = seq
                     self._det_time = t1 - t0
@@ -163,9 +166,9 @@ class FFmpegRTSPReader:
 
     def get_latest_detection(
         self,
-    ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray], int, float]:
+    ) -> Tuple[Optional[np.ndarray], float, Optional[np.ndarray], int, float]:
         with self._det_lock:
-            return self._input_frame, self._det_result, self._det_seq, self._det_time
+            return self._input_frame, self._input_frame_read_ts, self._det_result, self._det_seq, self._det_time
 
     # -------- internal --------
 
@@ -275,7 +278,7 @@ class FFmpegRTSPReader:
         print(
             f"[STAT] shown={s.det_latest_frame_id} (read={s.read_latest_frame_id}) "
             f"process_num={s.det_frames} (read={s.read_frames}) "
-            f"time={s.total_time * 1000:.2f}ms (det={s.det_time * 1000:.2f}ms) "
+            f"display={s.display_time * 1000:.2f}ms full_process={s.process_time * 1000:.2f}ms det={s.det_time * 1000:.2f}ms "
             f"skipped={s.skipped_frames} "
             f"read_fail={s.read_fail} restarts={s.restarts} "
         )
@@ -301,11 +304,19 @@ def main():
 
     last_shown_seq = 0
 
+    n=0
+    start_iter=1000
+
     try:
         while True:
-            start_time = time.perf_counter()
+            n+=1
+            if n==start_iter:
+                fps_time=time.perf_counter()
+                fps_counter=0
+
+            start_ts=time.perf_counter()
             # 推論結果を取得
-            frame, det, det_seq, det_time = reader.get_latest_detection()
+            frame, read_ts, det, det_seq, det_time = reader.get_latest_detection()
 
             if det_seq == last_shown_seq:
                 if cv2.waitKey(1) & 0xFF == ord("q"):
@@ -324,26 +335,35 @@ def main():
             if det is not None:
                 frame = detector.display_results(frame, det)
 
-            end_time = time.perf_counter()
-            total_time = end_time - start_time
-            reader.stats.total_time = total_time
-            cv2.putText(
-                frame,
-                f"frame_id={det_seq}(read={reader.stats.read_latest_frame_id}) "
-                f"time={total_time * 1000:.1f}ms "
-                f"det={det_time * 1000:.1f}ms",
-                (1200, 40),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1,
-                (0, 255, 0),
-                2,
-            )
+            if n>=start_iter:
+                fps_counter+=1
+                now=time.perf_counter()
+                elapsed=now-fps_time
+                fps=fps_counter/elapsed
+                print(fps, "FPS")
+                cv2.putText(
+                    frame,
+                    f"{fps}FPS",
+                    (1200, 40),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    1,
+                    (0, 255, 0),
+                    2,
+                )
 
             cv2.imshow("frame", frame)
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
 
-            reader.log_status()
+
+            end_ts = time.perf_counter()
+            process_time = end_ts - read_ts
+            display_time=end_ts-start_ts
+            reader.stats.process_time = process_time
+            reader.stats.display_time = display_time
+
+
+            # reader.log_status()
     finally:
         reader.stop()
         cv2.destroyAllWindows()
