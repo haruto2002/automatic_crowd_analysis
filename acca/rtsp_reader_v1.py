@@ -2,12 +2,11 @@ import subprocess
 import threading
 import time
 from dataclasses import dataclass
-from typing import Optional, Tuple, List
 from pathlib import Path
+from typing import List, Optional, Tuple
 
 import cv2
 import numpy as np
-
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 
@@ -18,6 +17,7 @@ PW = "AIST-rwdc"
 RTSP_URL = f"rtsp://{HOST}:{PW}@{IP}:{PORT}/ONVIF/MediaInput?profile=def_profile1"
 W, H = 1920, 1080  # ★ストリームの解像度に合わせる
 FPS = 15  # 任意（表示用/目安）
+
 
 class RealTimeDetector:
     def __init__(self, cfg_path: Path):
@@ -32,7 +32,6 @@ class RealTimeDetector:
     def run(self, images: List[np.ndarray]) -> List[np.ndarray]:
         results = self.detector(images)
         return results
-
 
     def display_results(
         self,

@@ -2,12 +2,11 @@ import subprocess
 import threading
 import time
 from dataclasses import dataclass
-from typing import Optional, Tuple, List, Any
 from pathlib import Path
+from typing import List, Optional, Tuple
 
 import cv2
 import numpy as np
-
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 
@@ -33,7 +32,6 @@ class RealTimeDetector:
         results = self.detector(images)
         return results
 
-
     def display_results(
         self,
         img: np.ndarray,
@@ -52,16 +50,10 @@ class ReaderStats:
     read_fail: int = 0
     restarts: int = 0
 
-    shown_frames: int = 0
-    skipped_frames: int = 0
-
     det_frames: int = 0
     det_time: float = 0.0
 
-    last_read_ts: float = 0.0
-    last_shown_ts: float = 0.0
-    last_det_ts: float = 0.0
-
+    skipped_frames: int = 0
     total_time: float = 0.0
 
 
@@ -97,9 +89,10 @@ class FFmpegRTSPReader:
 
         # detection（最新結果1つ）
         self._det_lock = threading.Lock()
-        self._input_frame:Optional[np.ndarray] =None
+        self._input_frame: Optional[np.ndarray] = None
         self._det_result: Optional[np.ndarray] = None
         self._det_seq: int = 0
+        self._det_time: float = 0.0
         self._det_ts: float = 0.0
         self._det_thread: Optional[threading.Thread] = None
 
@@ -128,7 +121,7 @@ class FFmpegRTSPReader:
     def start_detector(
         self,
         detector: RealTimeDetector,
-        infer_every_n: int = 1,  # 例: 2なら2フレームに1回
+        infer_every_n: int = 1,
     ) -> None:
         if self._det_thread and self._det_thread.is_alive():
             return
@@ -153,22 +146,23 @@ class FFmpegRTSPReader:
                 t1 = time.perf_counter()
 
                 with self._det_lock:
-                    self._input_frame=frame
+                    self._input_frame = frame
                     self._det_result = res
                     self._det_seq = seq
+                    self._det_time = t1 - t0
                     self._det_ts = time.perf_counter()
 
                     self.stats.det_frames += 1
-                    self.stats.det_time = t1 - t0
-                    self.stats.last_det_ts = self._det_ts
-                    self.stats.total_time=self._det_ts-frame_read_ts
+                    self.stats.det_time = self._det_time
 
         self._det_thread = threading.Thread(target=_loop, daemon=True)
         self._det_thread.start()
 
-    def get_latest_detection(self) -> Tuple[Any, int, float]:
+    def get_latest_detection(
+        self,
+    ) -> Tuple[Optional[np.ndarray], Optional[np.ndarray], int, float]:
         with self._det_lock:
-            return self._input_frame, self._det_result, self._det_seq, self._det_ts
+            return self._input_frame, self._det_result, self._det_seq, self._det_time
 
     # -------- internal --------
 
@@ -262,7 +256,6 @@ class FFmpegRTSPReader:
                 self._latest_ts = now
                 self._latest_seq += 1
                 self.stats.read_frames += 1
-                self.stats.last_read_ts = now
 
             if self.log_every_sec > 0 and now >= next_log:
                 next_log = now + self.log_every_sec
@@ -282,10 +275,10 @@ class FFmpegRTSPReader:
     def _log_status(self) -> None:
         s = self.stats
         print(
-            f"[STAT] read={s.read_frames} shown={s.shown_frames} skipped={s.skipped_frames} "
-            f"det={s.det_frames} det_time={s.det_time * 1000:.2f}ms "
+            f"[STAT] shown={s.det_frames} (read={s.read_frames}) "
+            f"time={s.total_time * 1000:.2f}ms (det={s.det_time * 1000:.2f}ms) "
+            f"skipped={s.skipped_frames} "
             f"read_fail={s.read_fail} restarts={s.restarts} "
-            f"total_time={s.total_time * 1000:.2f}ms"
         )
 
 
@@ -311,30 +304,27 @@ def main():
 
     try:
         while True:
-            frame, seq, ts = reader.get_latest()
-            if frame is None:
-                time.sleep(0.01)
-                continue
+            start_time = time.perf_counter()
+            # 推論結果を取得
+            frame, det, det_seq, det_time = reader.get_latest_detection()
 
             # スキップ検出
             if last_shown_seq != 0:
-                skipped = seq - last_shown_seq - 1
+                skipped = det_seq - last_shown_seq - 1
                 if skipped > 0:
                     reader.stats.skipped_frames += skipped
-            last_shown_seq = seq
-
-
-            # 推論結果を取得
-            det, det_seq, det_ts = reader.get_latest_detection()
+            last_shown_seq = det_seq
 
             # 推論結果を描画
             if det is not None:
                 frame = detector.display_results(frame, det)
 
-            age = time.perf_counter() - ts
+            end_time = time.perf_counter()
             cv2.putText(
                 frame,
-                f"seq={seq} age={age * 1000:.1f}ms det={reader.stats.det_time * 1000:.2f}ms",
+                f"seq={det_seq}(read={reader.stats.read_frames}) "
+                f"time={(end_time - start_time) * 1000:.1f}ms "
+                f"det={det_time * 1000:.1f}ms",
                 (1200, 40),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 1,
