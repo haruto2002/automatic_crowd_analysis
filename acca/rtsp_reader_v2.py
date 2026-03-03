@@ -46,12 +46,10 @@ class RealTimeDetector:
 
 @dataclass
 class ReaderStats:
-    read_latest_frame_id: int = 0
     read_frames: int = 0
     read_fail: int = 0
     restarts: int = 0
 
-    det_latest_frame_id: int = 0
     det_frames: int = 0
     det_time: float = 0.0
 
@@ -154,7 +152,6 @@ class FFmpegRTSPReader:
                     self._det_time = t1 - t0
                     self._det_ts = time.perf_counter()
 
-                    self.stats.det_latest_frame_id = self._det_seq
                     self.stats.det_frames += 1
                     self.stats.det_time = self._det_time
 
@@ -256,7 +253,6 @@ class FFmpegRTSPReader:
                 self._latest_frame = frame
                 self._latest_ts = now
                 self._latest_seq += 1
-                self.stats.read_latest_frame_id=self._latest_seq
                 self.stats.read_frames += 1
 
         self._terminate_ffmpeg()
@@ -273,8 +269,7 @@ class FFmpegRTSPReader:
     def log_status(self) -> None:
         s = self.stats
         print(
-            f"[STAT] shown={s.det_latest_frame_id} (read={s.read_latest_frame_id}) "
-            f"process_num={s.det_frames} (read={s.read_frames}) "
+            f"[STAT] shown={s.det_frames} (read={s.read_frames}) "
             f"time={s.total_time * 1000:.2f}ms (det={s.det_time * 1000:.2f}ms) "
             f"skipped={s.skipped_frames} "
             f"read_fail={s.read_fail} restarts={s.restarts} "
@@ -327,7 +322,7 @@ def main():
             end_time = time.perf_counter()
             cv2.putText(
                 frame,
-                f"frame_id={det_seq}(read={reader.stats.read_latest_frame_id}) "
+                f"seq={det_seq}(read={reader.stats.read_frames}) "
                 f"time={(end_time - start_time) * 1000:.1f}ms "
                 f"det={det_time * 1000:.1f}ms",
                 (1200, 40),
