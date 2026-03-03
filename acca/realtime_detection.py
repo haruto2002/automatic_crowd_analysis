@@ -11,7 +11,7 @@ HOST = "member"
 IP = "192.168.0.10"
 PORT = 554
 PW = "AIST-rwdc"
-RTSP_URL = f"rtsp://{HOST}:{PW}@{IP}:{PORT}/ONVIF/MediaInput?profile=def_profile4"
+RTSP_URL = f"rtsp://{HOST}:{PW}@{IP}:{PORT}/ONVIF/MediaInput?profile=def_profile1"
 
 
 class RealTimeDetector:
@@ -25,12 +25,7 @@ class RealTimeDetector:
         return detector
 
     def run(self, images: List[np.ndarray]) -> List[np.ndarray]:
-        time_start = time.time()
         results = self.detector(images)
-        time_end = time.time()
-        print(
-            f"Time taken: {time_end - time_start} seconds, {sum(len(result) for result in results)} people detected"
-        )
         return results
 
 
@@ -48,14 +43,44 @@ def display_results(
 def main():
     cfg_path = Path("acca/conf/rt_conf/p2pnet.yaml")
     detector = RealTimeDetector(cfg_path)
+    print("Detector setting DONE")
+
+    dummy=np.zeros((100,100,3),np.uint8)
+    cv2.imshow("Detection", dummy)
+    cv2.waitKey(1)
+
     cap = cv2.VideoCapture(RTSP_URL, cv2.CAP_FFMPEG)
+    print(f"RTSP connecting DONE: {RTSP_URL}")
+
+    t0=time.perf_counter()
+    ret, frame = cap.read()
+    t1=time.perf_counter()
+    cv2.imshow("Detection", frame)
+    t2=time.perf_counter()
+    cv2.waitKey(1)
+    t3=time.perf_counter()
+    # print("INIT", f"{t1-t0:03f}",f"{t2-t1:03f}",f"{t3-t2:03f}")
+    # print("INIT",t3-t0)
+
+    print("START")
+    n=0
     while True:
+        n+=1
+        t0=time.perf_counter()
         ret, frame = cap.read()
+        t1=time.perf_counter()
+
         if not ret:
             break
         results = detector.run([frame])
         frame = display_results(frame, results[0])
-        cv2.imshow("frame", frame)
+        t2=time.perf_counter()
+        cv2.imshow("Detection", frame)
+        t3=time.perf_counter()
+        cv2.waitKey(1)
+        t4=time.perf_counter()
+        print(f"{t1-t0:03f}",f"{t2-t1:03f}",f"{t3-t2:03f}",f"{t4-t3:03f}")
+        # print(t3-t0/
     cap.release()
     cv2.destroyAllWindows()
 
