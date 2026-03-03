@@ -256,7 +256,7 @@ class FFmpegRTSPReader:
                 self._latest_frame = frame
                 self._latest_ts = now
                 self._latest_seq += 1
-                self.stats.read_latest_frame_id=self._latest_seq
+                self.stats.read_latest_frame_id = self._latest_seq
                 self.stats.read_frames += 1
 
         self._terminate_ffmpeg()
@@ -307,7 +307,7 @@ def main():
             # 推論結果を取得
             frame, det, det_seq, det_time = reader.get_latest_detection()
 
-            if det_seq==last_shown_seq:
+            if det_seq == last_shown_seq:
                 if cv2.waitKey(1) & 0xFF == ord("q"):
                     break
                 time.sleep(0.01)
@@ -325,10 +325,12 @@ def main():
                 frame = detector.display_results(frame, det)
 
             end_time = time.perf_counter()
+            total_time = end_time - start_time
+            reader.stats.total_time = total_time
             cv2.putText(
                 frame,
                 f"frame_id={det_seq}(read={reader.stats.read_latest_frame_id}) "
-                f"time={(end_time - start_time) * 1000:.1f}ms "
+                f"time={total_time * 1000:.1f}ms "
                 f"det={det_time * 1000:.1f}ms",
                 (1200, 40),
                 cv2.FONT_HERSHEY_SIMPLEX,
